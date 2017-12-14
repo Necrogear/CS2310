@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.HashSet;
 
 public class InfoCenter implements Controller {
 
@@ -12,8 +13,12 @@ public class InfoCenter implements Controller {
 	// Maps a Train Line name as a string to it's stations as a string array
 	private HashMap<String, TrainLine> trainLines;
 
+	// Maps a Station to the TrainLines it can be found in,
+	private HashMap<String, HashSet<TrainLine>> stationLinks;
+
 	private InfoCenter() {
 		trainLines = new HashMap<String, TrainLine>();
+		stationLinks = new HashMap<String, HashSet<TrainLine>>();
 		try {
 			processCsv();
 		} catch (FileNotFoundException e) {
@@ -34,25 +39,33 @@ public class InfoCenter implements Controller {
 		Scanner scanner = new Scanner(new File("src/MTRsystem_partial.csv"));
 		while (scanner.hasNext()) {
 			String line = scanner.nextLine();
-			System.out.println(line);
 			String[] lineArray = line.split(",");
 			String lineName = lineArray[0];
 			TrainLine stations = new TrainLine();
 			stations.setLineName(lineName);
 			for (int i = 1; i < lineArray.length; i++) {
+				HashSet<TrainLine> linesSet = new HashSet<TrainLine>();
 				stations.add(lineArray[i]);
-				if (i==1) {
+
+				if (i == 1) {
 					stations.setFirstStation(lineArray[i]);
 				}
-				if (i==lineArray.length-1) {
+				if (i == lineArray.length - 1) {
 					stations.setLastStation(lineArray[i]);
+				}
+
+				if (!stationLinks.containsKey(lineArray[i])) {
+					stationLinks.put(lineArray[i], new HashSet<TrainLine>());
+					stationLinks.get(lineArray[i]).add(stations);
+				} else {
+					stationLinks.get(lineArray[i]).add(stations);
 				}
 
 			}
 			trainLines.put(lineName, stations);
 		}
 		scanner.close();
-		
+
 	}
 
 	@Override
@@ -60,7 +73,8 @@ public class InfoCenter implements Controller {
 
 		String output = "The termini in the MTR network are:\n\n";
 		for (TrainLine line : trainLines.values()) {
-			output = output + line.getLineName() + ": "+ line.getFirstStation() + " <-> " + line.getLastStation() +"\n";
+			output = output + line.getLineName() + ": " + line.getFirstStation() + " <-> " + line.getLastStation()
+					+ "\n";
 		}
 
 		return output;
@@ -83,12 +97,13 @@ public class InfoCenter implements Controller {
 
 	@Override
 	public String listAllDirectlyConnectedLines(String line) {
+		
+		TrainLine line1 = trainLines.get(line);
 		if (trainLines.get(line) != null) {
 			String output = "The direct connected lines to line:2" + line + " are:\n";
-			TrainLine line1 = trainLines.get(line);
-			for (String station: line1) {
-				
-			}
+			for (String stationName : trainLines.get(line)) {
+				output = output + stationLinks.get(stationName);
+				}
 			return output;
 		} else {
 			return "Train Line not found, please try retyping";
@@ -97,12 +112,8 @@ public class InfoCenter implements Controller {
 
 	@Override
 	public String showPathBetween(String stationA, String stationB) {
-		// TODO Auto-generated method stub
+
 		return "PATH BETWEEN";
-	}
-	
-	public boolean linesConnect(String[] line1, String[] line2) {
-		return false;
 	}
 
 }
