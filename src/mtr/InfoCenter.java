@@ -52,6 +52,7 @@ public class InfoCenter implements Controller {
 			trainLines.put(lineName, stations);
 		}
 		scanner.close();
+		
 	}
 
 	@Override
