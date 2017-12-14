@@ -120,7 +120,31 @@ public class InfoCenter implements Controller {
 	}
 
 	/**
-	 * Retrives as a string the stations that are termini of the lines in the network.
+	 * Processes the current network to identify the lines that directly connect to each line. The method
+	 * then stores these in a {@link HashMap}, where the key is the {@link TrainLine}, and the value
+	 * is a {@link hashSet} of the {@link TrainLine}s that connect to it.
+	 * 
+	 */
+	private void setupAdjacentLines() {
+		for (TrainLine line : trainLines.values()) {
+			TrainLine line1 = trainLines.get(line.getLineName());
+			HashSet<TrainLine> trainLineSet = new HashSet<TrainLine>();
+			if (line1 != null) {
+				String output = "The direct connected lines to " + line1.getLineName() + " are:\n";
+				for (String stationName : line1) {
+					for (TrainLine tl : stationLinks.get(stationName)) {
+						trainLineSet.add(tl);
+					}
+				}
+				trainLineSet.remove(trainLines.get(line));
+				adjHashMap.put(line1.getLineName(), trainLineSet);
+			}
+		}
+	}
+
+	
+	/**
+	 * Retrives as a string the stations that are termini of the {@link TrainLine}s in the network.
 	 * Formatted for output to console. 
 	 * 
 	 * @return <code>String</code>
@@ -139,7 +163,7 @@ public class InfoCenter implements Controller {
 	}
 
 	/**
-	 * Retrives as a string the stations in a given line, in the correct order..
+	 * Retrives as a string the stations in a given line, in their physical order.
 	 * Formatted for output to console. 
 	 * 
 	 * @return <code>String</code>
@@ -159,6 +183,13 @@ public class InfoCenter implements Controller {
 
 	}
 
+	/**
+	 * Retrives as a string the {@link TrainLine}s that are directly connected to the specified {@link TrainLine}.
+	 * Formatted for output to console. 
+	 * 
+	 * @return <code>String</code>
+	 * @param line
+	 */
 	@Override
 	public String listAllDirectlyConnectedLines(String line) {
 		if (adjHashMap.get(line) != null) {
@@ -172,22 +203,6 @@ public class InfoCenter implements Controller {
 		}
 	}
 
-	private void setupAdjacentLines() {
-		for (TrainLine line : trainLines.values()) {
-			TrainLine line1 = trainLines.get(line.getLineName());
-			HashSet<TrainLine> tls = new HashSet<TrainLine>();
-			if (line1 != null) {
-				String output = "The direct connected lines to " + line1.getLineName() + " are:\n";
-				for (String stationName : line1) {
-					for (TrainLine tl : stationLinks.get(stationName)) {
-						tls.add(tl);
-					}
-				}
-				tls.remove(trainLines.get(line));
-				adjHashMap.put(line1.getLineName(), tls);
-			}
-		}
-	}
 
 	@Override
 	public String showPathBetween(String stationA, String stationB) {
