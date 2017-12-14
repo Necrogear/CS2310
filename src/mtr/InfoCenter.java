@@ -1,10 +1,11 @@
 package mtr;
 
-import java.io.FileNotFoundException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.Scanner;
 import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
 
 public class InfoCenter implements Controller {
 
@@ -15,18 +16,21 @@ public class InfoCenter implements Controller {
 
 	// Maps a Station to the TrainLines it can be found in,
 	private HashMap<String, HashSet<TrainLine>> stationLinks;
+	
+	private HashMap<String,HashSet<TrainLine>> adjHashMap;
 
 	private InfoCenter() {
 		trainLines = new HashMap<String, TrainLine>();
 		stationLinks = new HashMap<String, HashSet<TrainLine>>();
+		adjHashMap = new HashMap<String,HashSet<TrainLine>>();
 		try {
 			processCsv();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		setupAdjacentLines();
 		tui = new TUI(this);
-
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
@@ -96,20 +100,49 @@ public class InfoCenter implements Controller {
 	}
 
 	@Override
-	public String listAllDirectlyConnectedLines(String line) {
-		
-		TrainLine line1 = trainLines.get(line);
-		if (trainLines.get(line) != null) {
-			String output = "The direct connected lines to line:2" + line + " are:\n";
-			for (String stationName : trainLines.get(line)) {
-				output = output + stationLinks.get(stationName);
-				}
-			return output;
-		} else {
-			return "Train Line not found, please try retyping";
+	public String listAllDirectlyConnectedLines(String str) {
+		String output="";
+		for(String line: adjHashMap.keySet()) {
+			if(str.equals(line)) {
+				adjHashMap.get(line).remove(trainLines.get(line));
+				output += adjHashMap.get(line).toString();
+			}
 		}
+//		TrainLine line1 = trainLines.get(line);
+//		HashSet<TrainLine> tls = new HashSet<TrainLine>();
+//		if (line1 != null) {
+//			String output = "The direct connected lines to " + line1.getLineName() + " are:\n";
+//			for (String stationName : line1) {
+//				for (TrainLine tl:stationLinks.get(stationName) ) {
+//				tls.add(tl);
+//				}
+//			}
+//		tls.remove(trainLines.get(line));
+//		output = tls.toString();
+//		return output;
+//		} else {
+//			return "Train Line not found, please try retyping";
+//		}
+		return output;
 	}
 
+	private void setupAdjacentLines() {
+		for(TrainLine line: trainLines.values()) {
+			TrainLine line1 = trainLines.get(line.getLineName());
+			HashSet<TrainLine> tls = new HashSet<TrainLine>();
+			if (line1 != null) {
+				String output = "The direct connected lines to " + line1.getLineName() + " are:\n";
+				for (String stationName : line1) {
+					for (TrainLine tl:stationLinks.get(stationName) ) {
+						tls.add(tl);
+					}
+				}
+				tls.remove(trainLines.get(line));
+				adjHashMap.put(line1.getLineName(), tls);	
+			}
+		}
+	}
+	
 	@Override
 	public String showPathBetween(String stationA, String stationB) {
 

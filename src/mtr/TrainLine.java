@@ -50,5 +50,9 @@ public class TrainLine extends LinkedHashSet<String> {
 		return stations;
 	}
 	
+	public String toString() {
+		return getLineName();
+	}
+	
 
 }
