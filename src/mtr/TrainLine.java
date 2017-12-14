@@ -7,7 +7,6 @@ public class TrainLine extends LinkedHashSet<String>{
 	private String lineName;
 	private String firstStation;
 	private String lastStation;
-	private String[] adjacentLines;
 	
 	public TrainLine() {
 		

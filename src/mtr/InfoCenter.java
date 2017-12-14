@@ -1,14 +1,9 @@
 package mtr;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Scanner;
-import java.util.Collections;
 
 public class InfoCenter implements Controller {
 
@@ -56,14 +51,15 @@ public class InfoCenter implements Controller {
 			}
 			trainLines.put(lineName, stations);
 		}
+		scanner.close();
 	}
 
 	@Override
 	public String listAllTermini() {
 
-		String output = "The termini in the MTR network are:\n";
+		String output = "The termini in the MTR network are:\n\n";
 		for (TrainLine line : trainLines.values()) {
-			output = output + line.getFirstStation() + "<>" + line.getLastStation() +"\n";
+			output = output + line.getLineName() + ": "+ line.getFirstStation() + " <-> " + line.getLastStation() +"\n";
 		}
 
 		return output;
