@@ -7,24 +7,49 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+/**
+ * Represents an information center for a railway network, handling reading and
+ * processing and output of data about the network.
+ * 
+ * @author Jawwad Choudhury
+ * @author Hassan Hussein
+ * @author Joseph Rolli
+ * 
+ */
 public class InfoCenter implements Controller {
 
+	/**
+	 * The {@link TUI} that holds all this {@link Game}'s states.
+	 */
 	private TUI tui;
 
-	// Maps a Train Line name as a string to it's stations as a string array
+	/**
+	 * The {@link HashMap} mapping the names of trainlines to their respective train
+	 * line.
+	 */
 	private HashMap<String, TrainLine> trainLines;
 
-	// Maps a Station to the TrainLines it can be found in,
+	/**
+	 * The {@link HashMap} mapping the stations in the network to the train lines
+	 * they are found in, stored in a {@link HashSet}.
+	 */
 	private HashMap<String, HashSet<TrainLine>> stationLinks;
-	
-	private HashMap<String,HashSet<TrainLine>> adjHashMap;
 
-	private InfoCenter() {
+	/**
+	 * The {@link HashMap} mapping a given line in the network to every line
+	 * connected directly to it, stored in a {@link HashSet}.
+	 */
+	private HashMap<String, HashSet<TrainLine>> adjHashMap;
+
+	private InfoCenter(String file) {
+		//Initialise hashmaps
 		trainLines = new HashMap<String, TrainLine>();
 		stationLinks = new HashMap<String, HashSet<TrainLine>>();
-		adjHashMap = new HashMap<String,HashSet<TrainLine>>();
+		adjHashMap = new HashMap<String, HashSet<TrainLine>>();
+		
+		//Read input file.
 		try {
-			processCsv();
+			processCsv(file);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -35,12 +60,12 @@ public class InfoCenter implements Controller {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		// new InfoCenter();
-		new InfoCenter();
+		new InfoCenter(args[0]);
 
 	}
 
-	public void processCsv() throws FileNotFoundException {
-		Scanner scanner = new Scanner(new File("src/MTRsystem_partial.csv"));
+	public void processCsv(String file) throws FileNotFoundException {
+		Scanner scanner = new Scanner(new File("src/" + file));
 		while (scanner.hasNext()) {
 			String line = scanner.nextLine();
 			String[] lineArray = line.split(",");
@@ -100,49 +125,38 @@ public class InfoCenter implements Controller {
 	}
 
 	@Override
-	public String listAllDirectlyConnectedLines(String str) {
-		String output="";
-		for(String line: adjHashMap.keySet()) {
-			if(str.equals(line)) {
-				adjHashMap.get(line).remove(trainLines.get(line));
-				output += adjHashMap.get(line).toString();
+	public String listAllDirectlyConnectedLines(String line) {
+		if (line != null) {
+			String output = "";
+			for (String line2 : adjHashMap.keySet()) {
+				if (line.equals(line2)) {
+					adjHashMap.get(line2).remove(trainLines.get(line2));
+					output += adjHashMap.get(line2).toString();
+				}
 			}
+			return output;
+		} else {
+			return "Train Line not found, please try retyping";
 		}
-//		TrainLine line1 = trainLines.get(line);
-//		HashSet<TrainLine> tls = new HashSet<TrainLine>();
-//		if (line1 != null) {
-//			String output = "The direct connected lines to " + line1.getLineName() + " are:\n";
-//			for (String stationName : line1) {
-//				for (TrainLine tl:stationLinks.get(stationName) ) {
-//				tls.add(tl);
-//				}
-//			}
-//		tls.remove(trainLines.get(line));
-//		output = tls.toString();
-//		return output;
-//		} else {
-//			return "Train Line not found, please try retyping";
-//		}
-		return output;
 	}
 
 	private void setupAdjacentLines() {
-		for(TrainLine line: trainLines.values()) {
+		for (TrainLine line : trainLines.values()) {
 			TrainLine line1 = trainLines.get(line.getLineName());
 			HashSet<TrainLine> tls = new HashSet<TrainLine>();
 			if (line1 != null) {
 				String output = "The direct connected lines to " + line1.getLineName() + " are:\n";
 				for (String stationName : line1) {
-					for (TrainLine tl:stationLinks.get(stationName) ) {
+					for (TrainLine tl : stationLinks.get(stationName)) {
 						tls.add(tl);
 					}
 				}
 				tls.remove(trainLines.get(line));
-				adjHashMap.put(line1.getLineName(), tls);	
+				adjHashMap.put(line1.getLineName(), tls);
 			}
 		}
 	}
-	
+
 	@Override
 	public String showPathBetween(String stationA, String stationB) {
 
