@@ -11,7 +11,7 @@ import java.util.Scanner;
  * processing and output of data about the network.
  * 
  * @author Jawwad Choudhury
- * @author Hassan Hussein
+ * @author Hassan Hussain
  * @author Joseph Rolli
  * 
  */
@@ -120,9 +120,10 @@ public class InfoCenter implements Controller {
 	}
 
 	/**
-	 * Processes the current network to identify the lines that directly connect to each line. The method
-	 * then stores these in a {@link HashMap}, where the key is the {@link TrainLine}, and the value
-	 * is a {@link hashSet} of the {@link TrainLine}s that connect to it.
+	 * Processes the current network to identify the lines that directly connect to
+	 * each line. The method then stores these in a {@link HashMap}, where the key
+	 * is the {@link TrainLine}, and the value is a {@link hashSet} of the
+	 * {@link TrainLine}s that connect to it.
 	 * 
 	 */
 	private void setupAdjacentLines() {
@@ -142,10 +143,9 @@ public class InfoCenter implements Controller {
 		}
 	}
 
-	
 	/**
-	 * Retrives as a string the stations that are termini of the {@link TrainLine}s in the network.
-	 * Formatted for output to console. 
+	 * Retrieves as a string the stations that are termini of the {@link TrainLine}s
+	 * in the network. Formatted for output to console.
 	 * 
 	 * @return <code>String</code>
 	 */
@@ -163,11 +163,12 @@ public class InfoCenter implements Controller {
 	}
 
 	/**
-	 * Retrives as a string the stations in a given line, in their physical order.
-	 * Formatted for output to console. 
+	 * Retrieves as a string the stations in a given line, in their physical order.
+	 * Formatted for output to console.
 	 * 
 	 * @return <code>String</code>
 	 * @param line
+	 *            The input line by name.
 	 */
 	@Override
 	public String listStationsInLine(String line) {
@@ -184,11 +185,12 @@ public class InfoCenter implements Controller {
 	}
 
 	/**
-	 * Retrives as a string the {@link TrainLine}s that are directly connected to the specified {@link TrainLine}.
-	 * Formatted for output to console. 
+	 * Retrieves as a string the {@link TrainLine}s that are directly connected to
+	 * the specified {@link TrainLine}. Formatted for output to console.
 	 * 
 	 * @return <code>String</code>
 	 * @param line
+	 *            The input line by name.
 	 */
 	@Override
 	public String listAllDirectlyConnectedLines(String line) {
@@ -203,11 +205,20 @@ public class InfoCenter implements Controller {
 		}
 	}
 
-
+	/**
+	 * Retrieves as a string the hops between stations and lines to reach station A
+	 * from station B. Formatted for output to console.
+	 * 
+	 * @return <code>String</code>
+	 * @param stationA
+	 *            The initial station.
+	 * @param stationB
+	 *            The station to be navigated to.
+	 */
 	@Override
 	public String showPathBetween(String stationA, String stationB) {
 
-		return "PATH BETWEEN";
+		return "Error: Method unimplemented";
 	}
 
 }
