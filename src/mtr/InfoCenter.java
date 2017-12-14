@@ -15,10 +15,10 @@ public class InfoCenter implements Controller {
 	private TUI tui;
 
 	// Maps a Train Line name as a string to it's stations as a string array
-	private HashMap<String, LinkedHashSet<String>> trainLine;
+	private HashMap<String, TrainLine> trainLines;
 
 	private InfoCenter() {
-		trainLine = new HashMap<String, LinkedHashSet<String>>();
+		trainLines = new HashMap<String, TrainLine>();
 		try {
 			processCsv();
 		} catch (FileNotFoundException e) {
@@ -42,13 +42,19 @@ public class InfoCenter implements Controller {
 			System.out.println(line);
 			String[] lineArray = line.split(",");
 			String lineName = lineArray[0];
-			LinkedHashSet<String> stations = new LinkedHashSet<String>();
-
+			TrainLine stations = new TrainLine();
+			stations.setLineName(lineName);
 			for (int i = 1; i < lineArray.length; i++) {
 				stations.add(lineArray[i]);
+				if (i==1) {
+					stations.setFirstStation(lineArray[i]);
+				}
+				if (i==lineArray.length-1) {
+					stations.setLastStation(lineArray[i]);
+				}
 
 			}
-			trainLine.put(lineName, stations);
+			trainLines.put(lineName, stations);
 		}
 	}
 
@@ -56,23 +62,19 @@ public class InfoCenter implements Controller {
 	public String listAllTermini() {
 
 		String output = "The termini in the MTR network are:\n";
-
-		for (LinkedHashSet<String> value : trainLine.values()) {
-			output = output + value.;
-			output = output + "<>";
-			output = output + value[value.length - 1];
-			output = output + "\n";
-
+		for (TrainLine line : trainLines.values()) {
+			output = output + line.getFirstStation() + "<>" + line.getLastStation() +"\n";
 		}
+
 		return output;
 
 	}
 
 	@Override
 	public String listStationsInLine(String line) {
-		if (trainLine.get(line) != null) {
+		if (trainLines.get(line) != null) {
 			String output = "The stations in line " + line + " are:\n";
-			for (String station : trainLine.get(line)) {
+			for (String station : trainLines.get(line)) {
 				output = output + station + "\n";
 			}
 			return output;
@@ -84,17 +86,10 @@ public class InfoCenter implements Controller {
 
 	@Override
 	public String listAllDirectlyConnectedLines(String line) {
-		if (trainLine.get(line) != null) {
+		if (trainLines.get(line) != null) {
 			String output = "The direct connected lines to line:2" + line + " are:\n";
-			String [] line1 = trainLine.get(line);
-			String [] line2 = null;
-			HashSet<String> hash = new HashSet<String>();
-			for (String station : trainLine.get(line)) {
-				hash.add(station);
-			}
-					
-			for (String[] value : trainLine.values()) {
-				line2 = value; 
+			TrainLine line1 = trainLines.get(line);
+			for (String station: line1) {
 				
 			}
 			return output;
