@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
 
 /**
  * Represents an information center for a railway network, handling reading and
@@ -42,36 +41,58 @@ public class InfoCenter implements Controller {
 	private HashMap<String, HashSet<TrainLine>> adjHashMap;
 
 	private InfoCenter(String file) {
-		//Initialise hashmaps
+		// Initialise hashmaps
 		trainLines = new HashMap<String, TrainLine>();
 		stationLinks = new HashMap<String, HashSet<TrainLine>>();
 		adjHashMap = new HashMap<String, HashSet<TrainLine>>();
-		
-		//Read input file.
+
+		// Read input file.
 		try {
 			processCsv(file);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// Calculate adjacent lines
 		setupAdjacentLines();
+		// Initialise console interface
 		tui = new TUI(this);
 	}
 
+	/**
+	 * The main for starting up this application. This application expects a single
+	 * argument as a string representing the name of the input file. This .csv data
+	 * file stores the lines and stations in the train network.
+	 * 
+	 * @param args
+	 *            input argument(s)
+	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		// new InfoCenter();
 		new InfoCenter(args[0]);
 
 	}
 
+	/**
+	 * Makes use of a {@link Scanner} to process the csv file representing the rail
+	 * network.
+	 * 
+	 * 
+	 * @param file
+	 *            <code>String</code> the input file.
+	 */
 	public void processCsv(String file) throws FileNotFoundException {
+		// Initialise scanner and parse file line by line.
 		Scanner scanner = new Scanner(new File("src/" + file));
 		while (scanner.hasNext()) {
 			String line = scanner.nextLine();
+			// Input line stored as String array, split by commas.
 			String[] lineArray = line.split(",");
 			String lineName = lineArray[0];
 			TrainLine stations = new TrainLine();
 			stations.setLineName(lineName);
+			// Seperates stations in parsed array from the line name, and adds to trainline.
+			// Also sets first and last station.
 			for (int i = 1; i < lineArray.length; i++) {
 				HashSet<TrainLine> linesSet = new HashSet<TrainLine>();
 				stations.add(lineArray[i]);
@@ -91,12 +112,19 @@ public class InfoCenter implements Controller {
 				}
 
 			}
+			// Adds train lines to trainLine hashmap.
 			trainLines.put(lineName, stations);
 		}
 		scanner.close();
 
 	}
 
+	/**
+	 * Retrives as a string the stations that are termini of the lines in the network.
+	 * Formatted for output to console. 
+	 * 
+	 * @return <code>String</code>
+	 */
 	@Override
 	public String listAllTermini() {
 
@@ -110,6 +138,13 @@ public class InfoCenter implements Controller {
 
 	}
 
+	/**
+	 * Retrives as a string the stations in a given line, in the correct order..
+	 * Formatted for output to console. 
+	 * 
+	 * @return <code>String</code>
+	 * @param line
+	 */
 	@Override
 	public String listStationsInLine(String line) {
 		if (trainLines.get(line) != null) {
@@ -119,24 +154,21 @@ public class InfoCenter implements Controller {
 			}
 			return output;
 		} else {
-			return "Train Line not found, please try retyping";
+			return "Train Line not found, please try retyping.";
 		}
 
 	}
 
 	@Override
 	public String listAllDirectlyConnectedLines(String line) {
-		if (line != null) {
-			String output = "";
-			for (String line2 : adjHashMap.keySet()) {
-				if (line.equals(line2)) {
-					adjHashMap.get(line2).remove(trainLines.get(line2));
-					output += adjHashMap.get(line2).toString();
-				}
-			}
+		if (adjHashMap.get(line) != null) {
+			String output = "The lines connected to " + line + " are:\n";
+			adjHashMap.get(line).remove(trainLines.get(line));
+			output += adjHashMap.get(line).toString();
+
 			return output;
 		} else {
-			return "Train Line not found, please try retyping";
+			return "Train Line not found, please try retyping.";
 		}
 	}
 
